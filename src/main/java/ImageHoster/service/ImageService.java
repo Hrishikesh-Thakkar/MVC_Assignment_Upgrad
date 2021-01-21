@@ -1,10 +1,12 @@
 package ImageHoster.service;
 
 import ImageHoster.model.Image;
+import ImageHoster.model.User;
 import ImageHoster.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -46,4 +48,8 @@ public class ImageService {
         imageRepository.deleteImage(imageId);
     }
 
+    public boolean isOwner(Image image, HttpSession httpSession) {
+        User user = (User) httpSession.getAttribute("loggeduser");
+        return user.getId().equals(image.getUser().getId());
+    }
 }
