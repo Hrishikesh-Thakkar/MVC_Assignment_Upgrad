@@ -1,5 +1,6 @@
 package ImageHoster.controller;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
@@ -16,6 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 @Controller
@@ -50,6 +55,7 @@ public class ImageController {
         Image image = imageService.getImage(imageId);
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
+        model.addAttribute("comments", imageService.getAllCommentsByImage(image));
         return "images/image";
     }
 
@@ -97,14 +103,15 @@ public class ImageController {
 
         String tags = convertTagsToString(image.getTags());
         model.addAttribute("image", image);
-        model.addAttribute("tags", tags);
-
         if(imageService.isOwner(image,httpSession)){
+            model.addAttribute("tags", tags);
             return "images/edit";
         }
         else{
             String error = "Only the owner of the image can edit the image";
             model.addAttribute("editError",error);
+            model.addAttribute("tags", image.getTags());
+            model.addAttribute("comments", imageService.getAllCommentsByImage(image));
             return "images/image";
         }
     }
@@ -158,12 +165,29 @@ public class ImageController {
             String error = "Only the owner of the image can delete the image";
             String tags = convertTagsToString(image.getTags());
             model.addAttribute("image", image);
-            model.addAttribute("tags", tags);
+            model.addAttribute("tags", image.getTags());
             model.addAttribute("deleteError",error);
+            model.addAttribute("comments", imageService.getAllCommentsByImage(image));
             return "images/image";
         }
     }
 
+    @RequestMapping(value = "/image/{id}/{title}/comments", method = RequestMethod.POST)
+    public String addComment(@PathVariable("id") Integer id, @PathVariable("title") String title, @RequestParam("comment") String comment, HttpSession httpSession){
+        Comment newComment = new Comment();
+        Date input = new Date();
+        Instant instant = input.toInstant();
+        ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+        LocalDate date = zdt.toLocalDate();
+        User user = (User) httpSession.getAttribute("loggeduser");
+        Image image = imageService.getImage(id);
+        newComment.setImage(image);
+        newComment.setUser(user);
+        newComment.setCreatedDate(date);
+        newComment.setText(comment);
+        imageService.addCommentToImage(newComment);
+        return "redirect:/images/" + id + '/' + title;
+    }
 
     //This method converts the image to Base64 format
     private String convertUploadedFileToBase64(MultipartFile file) throws IOException {

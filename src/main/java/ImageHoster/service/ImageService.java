@@ -1,5 +1,6 @@
 package ImageHoster.service;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.User;
 import ImageHoster.repository.ImageRepository;
@@ -51,5 +52,13 @@ public class ImageService {
     public boolean isOwner(Image image, HttpSession httpSession) {
         User user = (User) httpSession.getAttribute("loggeduser");
         return user.getId().equals(image.getUser().getId());
+    }
+
+    public List<Comment> getAllCommentsByImage(Image image){
+        return imageRepository.getAllComments(image.getId());
+    }
+
+    public void addCommentToImage(Comment newComment){
+        imageRepository.addComment(newComment);
     }
 }
