@@ -102,7 +102,7 @@ public class ImageController {
 
         String tags = convertTagsToString(image.getTags());
         model.addAttribute("image", image);
-        if(imageService.isOwner(image,httpSession)){
+        if(isOwner(image,httpSession)){
             model.addAttribute("tags", tags);
             return "images/edit";
         }
@@ -156,7 +156,7 @@ public class ImageController {
     @RequestMapping(value = "/deleteImage", method = RequestMethod.DELETE)
     public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId, HttpSession httpSession, Model model) {
         Image image = imageService.getImage(imageId);
-        if(imageService.isOwner(image,httpSession)){
+        if(isOwner(image,httpSession)){
             imageService.deleteImage(imageId);
             return "redirect:/images";
         }
@@ -202,6 +202,9 @@ public class ImageController {
     //Returns the string
     private String convertTagsToString(List<Tag> tags) {
         StringBuilder tagString = new StringBuilder();
+        if(tags.size()==0) {
+            return tagString.toString();
+        }
 
         for (int i = 0; i <= tags.size() - 2; i++) {
             tagString.append(tags.get(i).getName()).append(",");
@@ -211,5 +214,9 @@ public class ImageController {
         tagString.append(lastTag.getName());
 
         return tagString.toString();
+    }
+    public boolean isOwner(Image image, HttpSession httpSession) {
+        User user = (User) httpSession.getAttribute("loggeduser");
+        return user.getId().equals(image.getUser().getId());
     }
 }

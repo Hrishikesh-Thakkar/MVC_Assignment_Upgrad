@@ -32,15 +32,5 @@ public class UserService {
         }
     }
 
-    public boolean isValidPassword(String password) {
-        boolean hasAlpha = false;
-        boolean hasNum = false;
-        boolean hasSpecialChar = false;
-        for(Character character:password.toCharArray()){
-            if(character<='9' && character>='0') hasNum = true;
-            else if((character<='Z' && character>='A') || (character<='z' && character>='a')) hasAlpha = true;
-            else hasSpecialChar = true;
-        }
-        return hasAlpha && hasNum && hasSpecialChar;
-    }
+
 }

@@ -42,9 +42,9 @@ public class UserController {
     @RequestMapping(value = "users/registration", method = RequestMethod.POST)
     public String registerUser(User user, Model model) {
         String password = user.getPassword();
-        if(userService.isValidPassword(password)){
+        if(isValidPassword(password)){
             userService.registerUser(user);
-            return "redirect:/users/login";
+            return "users/login";
         }
        else{
             String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
@@ -87,5 +87,17 @@ public class UserController {
         List<Image> images = imageService.getAllImages();
         model.addAttribute("images", images);
         return "index";
+    }
+
+    public boolean isValidPassword(String password) {
+        boolean hasAlpha = false;
+        boolean hasNum = false;
+        boolean hasSpecialChar = false;
+        for(Character character:password.toCharArray()){
+            if(character<='9' && character>='0') hasNum = true;
+            else if((character<='Z' && character>='A') || (character<='z' && character>='a')) hasAlpha = true;
+            else hasSpecialChar = true;
+        }
+        return hasAlpha && hasNum && hasSpecialChar;
     }
 }
