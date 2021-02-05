@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "comment")
+//This Entity is used to represent a comment in a Post
 public class Comment {
 
     @Id
