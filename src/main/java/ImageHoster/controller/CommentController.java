@@ -27,6 +27,7 @@ public class CommentController {
     @Autowired
     private ImageService imageService;
 
+    //Request to add comment from a user on an Image
     @RequestMapping(value = "/image/{id}/{title}/comments", method = RequestMethod.POST)
     public String addComment(@PathVariable("id") Integer id, @PathVariable("title") String title, @RequestParam("comment") String comment, HttpSession httpSession){
         Comment newComment = new Comment();

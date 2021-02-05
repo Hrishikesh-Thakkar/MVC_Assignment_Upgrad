@@ -40,7 +40,7 @@ public class ImageController {
     }
 
     //This method is called when the details of the specific image with corresponding title are to be displayed
-    //The logic is to get the image from the databse with corresponding title. After getting the image from the database the details are shown
+    //The logic is to get the image from the database with corresponding title. After getting the image from the database the details are shown
     //First receive the dynamic parameter in the incoming request URL in a string variable 'title' and also the Model type object
     //Call the getImageByTitle() method in the business logic to fetch all the details of that image
     //Add the image in the Model type object with 'image' as the key
@@ -102,11 +102,10 @@ public class ImageController {
 
         String tags = convertTagsToString(image.getTags());
         model.addAttribute("image", image);
-        if(isOwner(image,httpSession)){
+        if (isOwner(image,httpSession)) {
             model.addAttribute("tags", tags);
             return "images/edit";
-        }
-        else{
+        } else {
             String error = "Only the owner of the image can edit the image";
             model.addAttribute("editError",error);
             model.addAttribute("tags", image.getTags());
@@ -133,9 +132,9 @@ public class ImageController {
         String updatedImageData = convertUploadedFileToBase64(file);
         List<Tag> imageTags = findOrCreateTags(tags);
 
-        if (updatedImageData.isEmpty())
+        if (updatedImageData.isEmpty()) {
             updatedImage.setImageFile(image.getImageFile());
-        else {
+        } else {
             updatedImage.setImageFile(updatedImageData);
         }
 
@@ -156,11 +155,10 @@ public class ImageController {
     @RequestMapping(value = "/deleteImage", method = RequestMethod.DELETE)
     public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId, HttpSession httpSession, Model model) {
         Image image = imageService.getImage(imageId);
-        if(isOwner(image,httpSession)){
+        if (isOwner(image,httpSession)) {
             imageService.deleteImage(imageId);
             return "redirect:/images";
-        }
-        else{
+        } else {
             String error = "Only the owner of the image can delete the image";
             String tags = convertTagsToString(image.getTags());
             model.addAttribute("image", image);
@@ -202,6 +200,8 @@ public class ImageController {
     //Returns the string
     private String convertTagsToString(List<Tag> tags) {
         StringBuilder tagString = new StringBuilder();
+
+        //Check added to ensure no tags won't cause ArrayIndexOutOfBounds Exception
         if(tags.size()==0) {
             return tagString.toString();
         }
@@ -215,6 +215,10 @@ public class ImageController {
 
         return tagString.toString();
     }
+
+    //The method checks if user is owner of image
+    //This is done by fetching ids from both image and session and comparing them
+    //Returns true or false
     public boolean isOwner(Image image, HttpSession httpSession) {
         User user = (User) httpSession.getAttribute("loggeduser");
         return user.getId().equals(image.getUser().getId());
