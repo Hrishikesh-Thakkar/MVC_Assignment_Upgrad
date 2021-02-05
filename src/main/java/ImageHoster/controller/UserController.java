@@ -42,12 +42,11 @@ public class UserController {
     @RequestMapping(value = "users/registration", method = RequestMethod.POST)
     public String registerUser(User user, Model model) {
         String password = user.getPassword();
-        if(isValidPassword(password)){
+        if (isValidPassword(password)) {
             userService.registerUser(user);
             return "users/login";
-        }
-       else{
-            String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
+        } else {
+            String error = "Password must contain at least 1 alphabet, 1 number & 1 special character";
             model.addAttribute("passwordTypeError",error);
             model.addAttribute("User",user);
             return "users/registration";
@@ -89,14 +88,23 @@ public class UserController {
         return "index";
     }
 
+    //This method is used to check if the password matches the following criteria
+    //1. Has an Alphabet of any case
+    //2. Has a number
+    //3. Has a Special Character (i.e Non Alphanumeric)
+    //When all three conditions are met true is returned else false
     public boolean isValidPassword(String password) {
         boolean hasAlpha = false;
         boolean hasNum = false;
         boolean hasSpecialChar = false;
         for(Character character:password.toCharArray()){
-            if(character<='9' && character>='0') hasNum = true;
-            else if((character<='Z' && character>='A') || (character<='z' && character>='a')) hasAlpha = true;
-            else hasSpecialChar = true;
+            if (character<='9' && character>='0') {
+                hasNum = true;
+            } else if ((character<='Z' && character>='A') || (character<='z' && character>='a')) {
+                hasAlpha = true;
+            } else {
+                hasSpecialChar = true;
+            }
         }
         return hasAlpha && hasNum && hasSpecialChar;
     }
